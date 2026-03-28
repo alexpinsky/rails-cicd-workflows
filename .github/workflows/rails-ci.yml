@@ -157,13 +157,15 @@ jobs:
           if-no-files-found: ignore
 
   deploy:
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    needs: >-
-      ${{
-        inputs.skip-system-tests
-          && fromJSON('["scan_ruby", "scan_js", "lint", "test"]')
-          || fromJSON('["scan_ruby", "scan_js", "lint", "test", "system-test"]')
-      }}
+    needs: [scan_ruby, scan_js, lint, test, system-test]
+    if: |
+      always() &&
+      github.ref == 'refs/heads/main' && github.event_name == 'push' &&
+      needs.scan_ruby.result == 'success' &&
+      (needs.scan_js.result == 'success' || needs.scan_js.result == 'skipped') &&
+      needs.lint.result == 'success' &&
+      needs.test.result == 'success' &&
+      (needs['system-test'].result == 'success' || needs['system-test'].result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Coolify Deployment
