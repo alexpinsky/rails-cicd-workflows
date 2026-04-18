@@ -20,9 +20,9 @@ on:
         default: ""
     secrets:
       COOLIFY_WEBHOOK_URL:
-        required: true
+        required: false
       COOLIFY_API_TOKEN:
-        required: true
+        required: false
 
 jobs:
   scan_ruby:
